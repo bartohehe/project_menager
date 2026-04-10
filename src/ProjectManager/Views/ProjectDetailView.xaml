@@ -1,0 +1,370 @@
+<UserControl x:Class="ProjectManager.Views.ProjectDetailView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:ProjectManager.Converters"
+             xmlns:models="clr-namespace:ProjectManager.Models">
+
+    <UserControl.Resources>
+        <conv:StatusToColorConverter x:Key="StatusToColor"/>
+        <conv:StatusToTextConverter x:Key="StatusToText"/>
+        <conv:DateFormatConverter x:Key="DateFormat"/>
+        <conv:RelativeDateConverter x:Key="RelativeDate"/>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVis"/>
+        <conv:NullToVisibilityConverter x:Key="NullToVis"/>
+        <conv:FileSizeConverter x:Key="FileSize"/>
+        <conv:ByteArrayToImageConverter x:Key="BytesToImage"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <!-- Loading Overlay -->
+        <Border Background="#80000000" Panel.ZIndex="10"
+                Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}">
+            <TextBlock Text="Ładowanie..." Foreground="{StaticResource BrushTextPrimary}"
+                       FontSize="16" FontFamily="Segoe UI"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Border>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Style="{StaticResource DarkScrollViewer}">
+            <StackPanel Margin="32,28">
+
+                <!-- Header Bar -->
+                <Grid Margin="0,0,0,24">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" Content="&#xE72B;" Style="{StaticResource IconButton}"
+                            Command="{Binding GoBackCommand}" FontSize="16" Margin="0,0,16,0"
+                            VerticalAlignment="Center"/>
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <!-- View Mode Name -->
+                        <TextBlock Text="{Binding Project.Name}" FontSize="24" FontWeight="Bold"
+                                   Foreground="{StaticResource BrushTextPrimary}" FontFamily="Segoe UI"
+                                   Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}, ConverterParameter=Invert}"/>
+                        <!-- Edit Mode Name -->
+                        <TextBox Text="{Binding EditName, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource DarkTextBox}" FontSize="18"
+                                 Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                        <Button Style="{StaticResource FlatButton}" Command="{Binding ToggleEditCommand}"
+                                Margin="0,0,8,0">
+                            <Button.Content>
+                                <TextBlock>
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="Edytuj"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                                    <Setter Property="Text" Value="Anuluj"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Button.Content>
+                        </Button>
+                        <Button Content="Zapisz" Style="{StaticResource AccentButton}"
+                                Command="{Binding SaveCommand}"
+                                Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}}"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Error -->
+                <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource BrushDanger}"
+                           FontFamily="Segoe UI" Margin="0,0,0,16"
+                           Visibility="{Binding ErrorMessage, Converter={StaticResource BoolToVis}}"
+                           TextWrapping="Wrap"/>
+
+                <!-- Info Grid -->
+                <Border Style="{StaticResource CardBorderStatic}" Padding="24" Margin="0,0,0,20">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Status -->
+                        <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                            <TextBlock Text="Status" Style="{StaticResource FieldLabel}"/>
+                            <Border Style="{StaticResource StatusBadge}"
+                                    Background="{Binding Project.Status, Converter={StaticResource StatusToColor}}"
+                                    Opacity="0.85">
+                                <TextBlock Text="{Binding Project.Status, Converter={StaticResource StatusToText}}"
+                                           Foreground="White"
+                                           FontSize="12" FontWeight="SemiBold" FontFamily="Segoe UI"/>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Category -->
+                        <StackPanel Grid.Column="1" Margin="0,0,16,0">
+                            <TextBlock Text="Kategoria" Style="{StaticResource FieldLabel}"/>
+                            <TextBlock Text="{Binding Project.Category}" FontSize="14"
+                                       Foreground="{StaticResource BrushAccent}" FontFamily="Segoe UI"/>
+                        </StackPanel>
+
+                        <!-- Start Date -->
+                        <StackPanel Grid.Column="2" Margin="0,0,16,0">
+                            <TextBlock Text="Data rozpoczęcia" Style="{StaticResource FieldLabel}"/>
+                            <TextBlock Text="{Binding Project.StartDate, Converter={StaticResource DateFormat}}"
+                                       FontSize="14" Foreground="{StaticResource BrushTextPrimary}"
+                                       FontFamily="Segoe UI"/>
+                            <DatePicker SelectedDate="{Binding EditStartDate}"
+                                        Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}}"
+                                        Margin="0,4,0,0"/>
+                        </StackPanel>
+
+                        <!-- End Date -->
+                        <StackPanel Grid.Column="3">
+                            <TextBlock Text="Data zakończenia" Style="{StaticResource FieldLabel}"/>
+                            <TextBlock Text="{Binding Project.EndDate, Converter={StaticResource DateFormat}}"
+                                       FontSize="14" Foreground="{StaticResource BrushTextPrimary}"
+                                       FontFamily="Segoe UI"/>
+                            <DatePicker SelectedDate="{Binding EditEndDate}"
+                                        Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}}"
+                                        Margin="0,4,0,0"/>
+                        </StackPanel>
+
+                        <!-- Price -->
+                        <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,16,16,0">
+                            <TextBlock Text="Cena" Style="{StaticResource FieldLabel}"/>
+                            <TextBlock FontSize="14" Foreground="{StaticResource BrushTextPrimary}" FontFamily="Segoe UI"
+                                       Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}, ConverterParameter=Invert}">
+                                <Run Text="{Binding Project.Price, StringFormat='{}{0:N2}', Mode=OneWay}"/>
+                                <Run Text="{Binding Project.Currency, Mode=OneWay}"/>
+                            </TextBlock>
+                            <TextBox Text="{Binding EditPrice, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource DarkTextBox}" Tag="0.00"
+                                     Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}}"/>
+                        </StackPanel>
+
+                        <!-- Status Change Buttons -->
+                        <StackPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3"
+                                    Orientation="Horizontal" Margin="0,16,0,0" VerticalAlignment="Bottom">
+                            <TextBlock Text="Zmień status:" Style="{StaticResource FieldLabel}"
+                                       VerticalAlignment="Center" Margin="0,0,12,0"/>
+                            <Button Content="Planowany" Style="{StaticResource FlatButton}"
+                                    Margin="0,0,8,0" Padding="12,6"
+                                    Command="{Binding ChangeStatusCommand}"
+                                    CommandParameter="{x:Static models:ProjectStatus.Planned}"/>
+                            <Button Content="W trakcie" Style="{StaticResource FlatButton}"
+                                    Margin="0,0,8,0" Padding="12,6"
+                                    Command="{Binding ChangeStatusCommand}"
+                                    CommandParameter="{x:Static models:ProjectStatus.InProgress}"/>
+                            <Button Content="Ukończony" Style="{StaticResource FlatButton}"
+                                    Padding="12,6"
+                                    Command="{Binding ChangeStatusCommand}"
+                                    CommandParameter="{x:Static models:ProjectStatus.Completed}"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Description -->
+                <Border Style="{StaticResource CardBorderStatic}" Padding="24" Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="Opis projektu" Style="{StaticResource SectionHeader}" FontSize="16"/>
+                        <TextBlock Text="{Binding Project.Description}" FontSize="14"
+                                   Foreground="{StaticResource BrushTextSecondary}"
+                                   FontFamily="Segoe UI" TextWrapping="Wrap"
+                                   Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}, ConverterParameter=Invert}"/>
+                        <TextBox Text="{Binding EditDescription, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource DarkTextBox}" TextWrapping="Wrap"
+                                 AcceptsReturn="True" MinHeight="120"
+                                 VerticalScrollBarVisibility="Auto"
+                                 Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Custom Sections -->
+                <ItemsControl ItemsSource="{Binding CustomSections}" Margin="0,0,0,20">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource CardBorderStatic}" Padding="24" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold"
+                                               Foreground="{StaticResource BrushTextPrimary}" FontFamily="Segoe UI"
+                                               Margin="0,0,0,8"/>
+                                    <TextBlock Text="{Binding Content}" FontSize="14"
+                                               Foreground="{StaticResource BrushTextSecondary}"
+                                               FontFamily="Segoe UI" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Add Section -->
+                <Button Content="+ Dodaj sekcję" Style="{StaticResource FlatButton}"
+                        HorizontalAlignment="Left" Margin="0,0,0,20"
+                        Click="OnAddSection"/>
+
+                <!-- Photo Gallery -->
+                <Border Style="{StaticResource CardBorderStatic}" Padding="24" Margin="0,0,0,20">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,16">
+                            <TextBlock Text="Zdjęcia" Style="{StaticResource SectionHeader}" FontSize="16" Margin="0"/>
+                            <Button Content="+ Dodaj zdjęcia" Style="{StaticResource FlatButton}"
+                                    HorizontalAlignment="Right" Command="{Binding AddPhotoCommand}"/>
+                        </Grid>
+                        <ItemsControl ItemsSource="{Binding GalleryImages}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{StaticResource BrushBgDark}" CornerRadius="6"
+                                            Margin="0,0,8,8" Width="180" Height="140"
+                                            ClipToBounds="True">
+                                        <Image Source="{Binding Converter={StaticResource BytesToImage}}"
+                                               Stretch="UniformToFill"/>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- Attachments -->
+                <Border Style="{StaticResource CardBorderStatic}" Padding="24" Margin="0,0,0,20">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,16">
+                            <TextBlock Text="Załączniki" Style="{StaticResource SectionHeader}" FontSize="16" Margin="0"/>
+                            <Button Content="+ Dodaj pliki" Style="{StaticResource FlatButton}"
+                                    HorizontalAlignment="Right" Command="{Binding AddAttachmentCommand}"/>
+                        </Grid>
+                        <ItemsControl ItemsSource="{Binding Attachments}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{StaticResource BrushBgDark}" CornerRadius="6"
+                                            Padding="12,10" Margin="0,0,0,6">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="&#xE8A5;"
+                                                       FontFamily="Segoe MDL2 Assets" FontSize="16"
+                                                       Foreground="{StaticResource BrushTextMuted}"
+                                                       VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding FileName}"
+                                                       FontSize="13" Foreground="{StaticResource BrushTextPrimary}"
+                                                       FontFamily="Segoe UI" VerticalAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding FileSizeBytes, Converter={StaticResource FileSize}}"
+                                                       FontSize="12" Foreground="{StaticResource BrushTextMuted}"
+                                                       FontFamily="Segoe UI" VerticalAlignment="Center"
+                                                       Margin="12,0"/>
+                                            <Button Grid.Column="3" Content="&#xE896;"
+                                                    Style="{StaticResource IconButton}"
+                                                    Command="{Binding DataContext.DownloadAttachmentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"/>
+                                            <Button Grid.Column="4" Content="&#xE74D;"
+                                                    Style="{StaticResource IconButton}"
+                                                    Foreground="{StaticResource BrushDanger}"
+                                                    Command="{Binding DataContext.DeleteAttachmentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- Timeline -->
+                <Border Style="{StaticResource CardBorderStatic}" Padding="24" Margin="0,0,0,20">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,16">
+                            <TextBlock Text="Timeline" Style="{StaticResource SectionHeader}" FontSize="16" Margin="0"/>
+                            <Button Content="+ Dodaj wpis" Style="{StaticResource FlatButton}"
+                                    HorizontalAlignment="Right" x:Name="AddTimelineBtn"
+                                    Click="OnAddTimelineEntry"/>
+                        </Grid>
+
+                        <ItemsControl ItemsSource="{Binding TimelineEntries}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="30"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Date -->
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{Binding Date, Converter={StaticResource DateFormat}}"
+                                                   FontSize="12" Foreground="{StaticResource BrushTextMuted}"
+                                                   FontFamily="Segoe UI" VerticalAlignment="Top"
+                                                   HorizontalAlignment="Right" Margin="0,12,0,0"/>
+
+                                        <!-- Line & Dot -->
+                                        <Grid Grid.Column="1" HorizontalAlignment="Center">
+                                            <Border Width="2" Background="{StaticResource BrushBorder}"
+                                                    VerticalAlignment="Stretch"/>
+                                            <Ellipse Width="12" Height="12" VerticalAlignment="Top"
+                                                     Margin="0,14,0,0"
+                                                     Fill="{Binding Type, Converter={StaticResource StatusToColor}}"
+                                                     Stroke="{StaticResource BrushBgCard}" StrokeThickness="2"/>
+                                        </Grid>
+
+                                        <!-- Content -->
+                                        <Border Grid.Column="2" Background="{StaticResource BrushBgDark}"
+                                                CornerRadius="8" Padding="16,12" Margin="8,4,0,8">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="SemiBold"
+                                                           Foreground="{StaticResource BrushTextPrimary}"
+                                                           FontFamily="Segoe UI"/>
+                                                <TextBlock Text="{Binding Description}" FontSize="13"
+                                                           Foreground="{StaticResource BrushTextSecondary}"
+                                                           FontFamily="Segoe UI" TextWrapping="Wrap"
+                                                           Margin="0,4,0,0"
+                                                           Visibility="{Binding Description, Converter={StaticResource NullToVis}}"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- Danger Zone -->
+                <Border Background="#1A0A0A" BorderBrush="#3D1515" BorderThickness="1"
+                        CornerRadius="8" Padding="24" Margin="0,0,0,32">
+                    <Grid>
+                        <StackPanel>
+                            <TextBlock Text="Strefa zagrożenia" FontSize="16" FontWeight="SemiBold"
+                                       Foreground="{StaticResource BrushDanger}" FontFamily="Segoe UI"
+                                       Margin="0,0,0,8"/>
+                            <TextBlock Text="Usunięcie projektu jest nieodwracalne. Wszystkie dane, zdjęcia i pliki zostaną usunięte."
+                                       Foreground="{StaticResource BrushTextSecondary}" FontFamily="Segoe UI"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <Button Content="Usuń projekt" Style="{StaticResource FlatButton}"
+                                Foreground="{StaticResource BrushDanger}"
+                                BorderBrush="#3D1515"
+                                HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Click="OnDeleteProject"/>
+                    </Grid>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

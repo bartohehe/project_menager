@@ -1,0 +1,60 @@
+<Window x:Class="ProjectManager.Views.Dialogs.AddTimelineEntryDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:models="clr-namespace:ProjectManager.Models"
+        Title="Dodaj wpis na timeline" Width="500" Height="380"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="None" ResizeMode="NoResize"
+        Background="#141B2A" ShowInTaskbar="False">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="36" ResizeBorderThickness="0"
+                      GlassFrameThickness="0" UseAeroCaptionButtons="False"/>
+    </WindowChrome.WindowChrome>
+
+    <Border BorderBrush="#283750" BorderThickness="1" CornerRadius="8">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="36"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Title Bar -->
+            <Border Grid.Row="0" Background="#141B2A" CornerRadius="8,8,0,0">
+                <Grid>
+                    <TextBlock Text="Dodaj wpis na timeline" FontSize="13" FontFamily="Segoe UI"
+                               Foreground="#F0F5FF" VerticalAlignment="Center" Margin="16,0"/>
+                    <Button Content="&#xE8BB;" Style="{StaticResource WinChromeButtonClose}"
+                            HorizontalAlignment="Right" Click="OnCancel"/>
+                </Grid>
+            </Border>
+
+            <StackPanel Grid.Row="1" Margin="24,16,24,24">
+                <TextBlock Text="Tytuł *" Style="{StaticResource FieldLabel}"/>
+                <TextBox x:Name="TitleBox" Style="{StaticResource DarkTextBox}"
+                         Tag="Tytuł wpisu..." Margin="0,0,0,16"/>
+
+                <TextBlock Text="Opis" Style="{StaticResource FieldLabel}"/>
+                <TextBox x:Name="DescriptionBox" Style="{StaticResource DarkTextBox}"
+                         Tag="Opis (opcjonalny)..." TextWrapping="Wrap"
+                         AcceptsReturn="True" MinHeight="80" Margin="0,0,0,16"/>
+
+                <TextBlock Text="Typ wpisu" Style="{StaticResource FieldLabel}"/>
+                <ComboBox x:Name="TypeCombo" Style="{StaticResource DarkComboBox}"
+                          ItemContainerStyle="{StaticResource DarkComboBoxItem}"
+                          SelectedIndex="0" Margin="0,0,0,24">
+                    <ComboBoxItem Content="Aktualizacja" Tag="{x:Static models:TimelineEntryType.Update}"/>
+                    <ComboBoxItem Content="Kamień milowy" Tag="{x:Static models:TimelineEntryType.Milestone}"/>
+                    <ComboBoxItem Content="Zdjęcie" Tag="{x:Static models:TimelineEntryType.Photo}"/>
+                    <ComboBoxItem Content="Po zakończeniu" Tag="{x:Static models:TimelineEntryType.PostCompletion}"/>
+                </ComboBox>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Anuluj" Style="{StaticResource FlatButton}"
+                            Margin="0,0,8,0" Click="OnCancel"/>
+                    <Button Content="Dodaj" Style="{StaticResource AccentButton}" Click="OnConfirm"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

@@ -1,0 +1,77 @@
+<Window x:Class="ProjectManager.Views.Dialogs.ImageGalleryDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:conv="clr-namespace:ProjectManager.Converters"
+        Title="Galeria zdjęć" Width="900" Height="650"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="None" ResizeMode="CanResize"
+        Background="#0D111B" ShowInTaskbar="False">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="36" ResizeBorderThickness="6"
+                      GlassFrameThickness="0" UseAeroCaptionButtons="False"/>
+    </WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <conv:ByteArrayToImageConverter x:Key="BytesToImage"/>
+    </Window.Resources>
+
+    <Border BorderBrush="#283750" BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="36"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Title Bar -->
+            <Border Grid.Row="0" Background="#141B2A">
+                <Grid>
+                    <TextBlock Text="Galeria zdjęć" FontSize="13" FontFamily="Segoe UI"
+                               Foreground="#F0F5FF" VerticalAlignment="Center" Margin="16,0"/>
+                    <Button Content="&#xE8BB;" Style="{StaticResource WinChromeButtonClose}"
+                            HorizontalAlignment="Right" Click="OnClose"/>
+                </Grid>
+            </Border>
+
+            <!-- Main Image -->
+            <Border Grid.Row="1" Background="#0D111B" Margin="16">
+                <Image x:Name="MainImage" Stretch="Uniform"/>
+            </Border>
+
+            <!-- Thumbnails -->
+            <Border Grid.Row="2" Background="#141B2A" Padding="8">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                    <ItemsControl x:Name="ThumbnailList">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Cursor="Hand" Click="OnThumbnailClick" Margin="4">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="Bd" Background="#1A2335" CornerRadius="4"
+                                                    Width="80" Height="60" ClipToBounds="True"
+                                                    BorderThickness="2" BorderBrush="Transparent">
+                                                <Image Source="{Binding Converter={StaticResource BytesToImage}}"
+                                                       Stretch="UniformToFill"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Bd" Property="BorderBrush" Value="#00BC8C"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+    </Border>
+</Window>
