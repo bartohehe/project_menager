@@ -5,7 +5,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Thumb">
-                    <Border Background="{StaticResource BrushBorder}" CornerRadius="3"
+                    <Border Background="{DynamicResource BrushBorder}" CornerRadius="3"
                             Margin="1" Opacity="0.6"/>
                 </ControlTemplate>
             </Setter.Value>

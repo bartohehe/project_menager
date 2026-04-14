@@ -83,8 +83,32 @@ public partial class App : Application
 
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
+        var ex = e.Exception;
+        var details = new System.Text.StringBuilder();
+        details.AppendLine($"Typ: {ex.GetType().FullName}");
+        details.AppendLine($"Message: {ex.Message}");
+        if (ex.InnerException is not null)
+        {
+            details.AppendLine();
+            details.AppendLine($"Inner: {ex.InnerException.GetType().FullName}");
+            details.AppendLine($"Inner message: {ex.InnerException.Message}");
+        }
+        details.AppendLine();
+        details.AppendLine("Stack trace:");
+        details.AppendLine(ex.StackTrace);
+
+        try
+        {
+            var logPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "ProjectManager", "error.log");
+            Directory.CreateDirectory(Path.GetDirectoryName(logPath)!);
+            File.WriteAllText(logPath, details.ToString());
+        }
+        catch { }
+
         MessageBox.Show(
-            $"Wystąpił nieoczekiwany błąd:\n\n{e.Exception.Message}",
+            $"Wystąpił nieoczekiwany błąd:\n\n{details}",
             "Błąd aplikacji",
             MessageBoxButton.OK,
             MessageBoxImage.Error);

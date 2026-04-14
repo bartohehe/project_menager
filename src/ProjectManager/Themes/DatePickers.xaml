@@ -2,9 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Style TargetType="DatePicker">
-        <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}"/>
-        <Setter Property="Background" Value="{StaticResource BrushBgCard}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}"/>
+        <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+        <Setter Property="Background" Value="{DynamicResource BrushBgCard}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="FontFamily" Value="Segoe UI"/>
         <Setter Property="FontSize" Value="13"/>

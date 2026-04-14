@@ -2,15 +2,15 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Style x:Key="DarkTextBox" TargetType="TextBox">
-        <Setter Property="Background" Value="{StaticResource BrushBgCard}"/>
-        <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}"/>
-        <Setter Property="CaretBrush" Value="{StaticResource BrushTextPrimary}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}"/>
+        <Setter Property="Background" Value="{DynamicResource BrushBgCard}"/>
+        <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+        <Setter Property="CaretBrush" Value="{DynamicResource BrushTextPrimary}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="FontFamily" Value="Segoe UI"/>
         <Setter Property="Padding" Value="12,10"/>
-        <Setter Property="SelectionBrush" Value="{StaticResource BrushAccent}"/>
+        <Setter Property="SelectionBrush" Value="{DynamicResource BrushAccent}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
@@ -20,7 +20,7 @@
                             CornerRadius="6" SnapsToDevicePixels="True">
                         <Grid>
                             <TextBlock x:Name="Placeholder" Text="{TemplateBinding Tag}"
-                                       Foreground="{StaticResource BrushTextMuted}"
+                                       Foreground="{DynamicResource BrushTextMuted}"
                                        Padding="{TemplateBinding Padding}"
                                        VerticalAlignment="Center"
                                        Visibility="Collapsed" IsHitTestVisible="False"/>
@@ -36,10 +36,10 @@
                             <Setter TargetName="Placeholder" Property="Visibility" Value="Visible"/>
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource BrushTextMuted}"/>
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource BrushTextMuted}"/>
                         </Trigger>
                         <Trigger Property="IsFocused" Value="True">
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource BrushAccent}"/>
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -48,15 +48,15 @@
     </Style>
 
     <Style x:Key="DarkPasswordBox" TargetType="PasswordBox">
-        <Setter Property="Background" Value="{StaticResource BrushBgCard}"/>
-        <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}"/>
-        <Setter Property="CaretBrush" Value="{StaticResource BrushTextPrimary}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}"/>
+        <Setter Property="Background" Value="{DynamicResource BrushBgCard}"/>
+        <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+        <Setter Property="CaretBrush" Value="{DynamicResource BrushTextPrimary}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="FontFamily" Value="Segoe UI"/>
         <Setter Property="Padding" Value="12,10"/>
-        <Setter Property="SelectionBrush" Value="{StaticResource BrushAccent}"/>
+        <Setter Property="SelectionBrush" Value="{DynamicResource BrushAccent}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="PasswordBox">
@@ -68,10 +68,10 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource BrushTextMuted}"/>
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource BrushTextMuted}"/>
                         </Trigger>
                         <Trigger Property="IsFocused" Value="True">
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource BrushAccent}"/>
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
