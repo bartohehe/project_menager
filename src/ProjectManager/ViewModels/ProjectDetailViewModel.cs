@@ -48,7 +48,19 @@ public partial class ProjectDetailViewModel : ObservableObject, IParameterReceiv
     [ObservableProperty]
     private ProjectStatus _editStatus;
 
-    public ObservableCollection<TimelineEntry> TimelineEntries { get; } = [];
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsGeneralTab))]
+    [NotifyPropertyChangedFor(nameof(IsTimelineTab))]
+    private int _activeTab = 0;
+
+    public bool IsGeneralTab  => ActiveTab == 0;
+    public bool IsTimelineTab => ActiveTab == 1;
+
+    [ObservableProperty]
+    private bool _isLayoutEditing;
+
+    public ObservableCollection<SectionCard>    SectionCards   { get; } = [];
+    public ObservableCollection<TimelineEntry>  TimelineEntries { get; } = [];
     public ObservableCollection<ProjectAttachment> Attachments { get; } = [];
     public ObservableCollection<ProjectSection> CustomSections { get; } = [];
     public ObservableCollection<byte[]> GalleryImages { get; } = [];
@@ -103,6 +115,7 @@ public partial class ProjectDetailViewModel : ObservableObject, IParameterReceiv
                 CustomSections.Add(section);
 
             await LoadGalleryImagesAsync(project);
+            BuildSectionCards();
         }
         catch (Exception ex)
         {
@@ -113,6 +126,64 @@ public partial class ProjectDetailViewModel : ObservableObject, IParameterReceiv
             IsBusy = false;
         }
     }
+
+    private void BuildSectionCards()
+    {
+        if (Project is null) return;
+
+        SectionCards.Clear();
+
+        var defaultIds = new List<string> { "desc", "photos", "attachments" }
+            .Concat(Project.CustomSections.OrderBy(s => s.Order).Select(s => s.Id))
+            .ToList();
+
+        // Merge saved order with any missing cards
+        var order = Project.CardOrder.Count > 0
+            ? Project.CardOrder.Union(defaultIds).ToList()
+            : defaultIds;
+
+        foreach (var id in order)
+        {
+            switch (id)
+            {
+                case "desc":
+                    SectionCards.Add(new SectionCard { Type = SectionCardType.Description, Id = "desc" });
+                    break;
+                case "photos":
+                    SectionCards.Add(new SectionCard { Type = SectionCardType.Photos, Id = "photos" });
+                    break;
+                case "attachments":
+                    SectionCards.Add(new SectionCard { Type = SectionCardType.Attachments, Id = "attachments" });
+                    break;
+                default:
+                    var section = Project.CustomSections.FirstOrDefault(s => s.Id == id);
+                    if (section is not null)
+                        SectionCards.Add(new SectionCard { Type = SectionCardType.Custom, Id = id, Section = section });
+                    break;
+            }
+        }
+    }
+
+    /// <summary>Called from code-behind during drag-drop to reorder cards.</summary>
+    public void MoveCard(SectionCard source, SectionCard target)
+    {
+        var si = SectionCards.IndexOf(source);
+        var ti = SectionCards.IndexOf(target);
+        if (si < 0 || ti < 0 || si == ti) return;
+        SectionCards.Move(si, ti);
+    }
+
+    [RelayCommand]
+    private async Task SaveLayoutAsync()
+    {
+        if (Project is null) return;
+        Project.CardOrder = SectionCards.Select(c => c.Id).ToList();
+        await _projectRepo.UpdateAsync(Project);
+        IsLayoutEditing = false;
+    }
+
+    [RelayCommand]
+    private void ToggleLayoutEdit() => IsLayoutEditing = !IsLayoutEditing;
 
     private async Task LoadGalleryImagesAsync(Project project)
     {
@@ -422,6 +493,7 @@ public partial class ProjectDetailViewModel : ObservableObject, IParameterReceiv
         Project.CustomSections.Add(section);
         await _projectRepo.UpdateAsync(Project);
         CustomSections.Add(section);
+        BuildSectionCards();
     }
 
     [RelayCommand]
@@ -464,6 +536,16 @@ public partial class ProjectDetailViewModel : ObservableObject, IParameterReceiv
             IsBusy = false;
         }
     }
+
+    [RelayCommand]
+    private void SwitchTab(string tab)
+    {
+        if (int.TryParse(tab, out var t))
+            ActiveTab = t;
+    }
+
+    [RelayCommand]
+    private void NavigateToNewProject() => _navigation.NavigateTo<NewProjectViewModel>();
 
     [RelayCommand]
     private void GoBack() => _navigation.GoBack();

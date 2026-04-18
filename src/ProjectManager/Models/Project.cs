@@ -59,4 +59,7 @@ public class Project
 
     [BsonElement("attachments")]
     public List<ProjectAttachment> Attachments { get; set; } = [];
+
+    [BsonElement("cardOrder")]
+    public List<string> CardOrder { get; set; } = [];
 }

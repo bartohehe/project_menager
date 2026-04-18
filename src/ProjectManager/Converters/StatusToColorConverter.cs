@@ -43,15 +43,18 @@ public class StatusToColorConverter : IValueConverter
 
 public class StatusToTextConverter : IValueConverter
 {
+    public static IReadOnlyList<ProjectStatus> AllStatuses { get; } =
+        Enum.GetValues<ProjectStatus>().ToArray();
+
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is ProjectStatus status)
         {
             return status switch
             {
-                ProjectStatus.Planned => "Planowany",
+                ProjectStatus.Planned    => "Planowany",
                 ProjectStatus.InProgress => "W trakcie",
-                ProjectStatus.Completed => "Ukończony",
+                ProjectStatus.Completed  => "Ukończony",
                 _ => "Nieznany"
             };
         }

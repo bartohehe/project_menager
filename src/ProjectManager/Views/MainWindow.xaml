@@ -79,9 +79,11 @@
                         <RadioButton Content="Projekty" Tag="&#xE8B7;"
                                      Style="{StaticResource NavButton}" GroupName="Nav"
                                      Command="{Binding NavigateToProjectListCommand}"/>
-                        <RadioButton Content="Nowy projekt" Tag="&#xE710;"
-                                     Style="{StaticResource NavButton}" GroupName="Nav"
-                                     Command="{Binding NavigateToNewProjectCommand}"/>
+                        <!-- Orange accent "Nowy projekt" button -->
+                        <Button Content="+ Nowy projekt"
+                                Margin="12,4,12,4" Height="38"
+                                Command="{Binding NavigateToNewProjectCommand}"
+                                Style="{StaticResource AccentButton}"/>
                     </StackPanel>
                 </DockPanel>
             </Border>
