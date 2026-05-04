@@ -6,7 +6,9 @@
       "Bash(dotnet restore:*)",
       "Bash(dotnet build:*)",
       "Bash(dotnet list:*)",
-      "Bash(dotnet add:*)"
+      "Bash(dotnet add:*)",
+      "mcp__plugin_claude-mem_mcp-search__smart_outline",
+      "Bash(Get-Content \"E:\\\\Projekty\\\\project_menager\\\\src\\\\ProjectManager\\\\Views\\\\ProjectDetailView.xaml.cs\")"
     ]
   }
 }

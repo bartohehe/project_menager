@@ -599,13 +599,6 @@
                     <!-- Items -->
                     <ItemsControl ItemsSource="{Binding TimelineEntries}"
                                   AlternationCount="2" VerticalAlignment="Stretch">
-                        <ItemsControl.ItemContainerStyle>
-                            <Style TargetType="ContentPresenter">
-                                <Setter Property="Tag"
-                                        Value="{Binding RelativeSource={RelativeSource Self},
-                                               Path=(ItemsControl.AlternationIndex)}"/>
-                            </Style>
-                        </ItemsControl.ItemContainerStyle>
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel Orientation="Horizontal"/>
@@ -672,13 +665,15 @@
                                     </Border>
                                 </Grid>
                             <DataTemplate.Triggers>
-                                <DataTrigger Binding="{Binding Tag,
+                                <!-- AlternationIndex 0 → card on top, date on bottom -->
+                                <DataTrigger Binding="{Binding Path=(ItemsControl.AlternationIndex),
                                              RelativeSource={RelativeSource AncestorType=ContentPresenter}}"
                                              Value="0">
                                     <Setter TargetName="TopCard"    Property="Visibility" Value="Visible"/>
                                     <Setter TargetName="BottomDate" Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Tag,
+                                <!-- AlternationIndex 1 → date on top, card on bottom -->
+                                <DataTrigger Binding="{Binding Path=(ItemsControl.AlternationIndex),
                                              RelativeSource={RelativeSource AncestorType=ContentPresenter}}"
                                              Value="1">
                                     <Setter TargetName="TopDate"    Property="Visibility" Value="Visible"/>
